@@ -1,4 +1,4 @@
-## Pattrns
+## Patterns
 
 #### Q1. Wraps an object to provide new behavior.
 
