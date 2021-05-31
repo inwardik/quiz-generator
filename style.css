@@ -46,10 +46,11 @@ b {
 
 .option {
     display: block;
-    height: 50px;
+    height: 60px;
     background-color: #f4f4f4;
     position: relative;
-    width: 100%
+    width: 100%;
+    margin-bottom: 5px
 }
 
 .option:hover {
@@ -66,19 +67,14 @@ b {
 .checkmark,
 .crossmark {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 15px;
+    right: -20px;
     height: 22px;
     width: 22px;
-    background-color: #f4f4f4;
     border-radius: 2px;
     padding: 0
 }
 
-.option:hover input~.checkmark,
-.option:hover input~.crossmark {
-    background-color: #e8e8e8
-}
 
 .option input:checked~.checkmark {
     background-color: #79d70f
