@@ -24,6 +24,7 @@ Installation
 Clone the repo with `git clone https://github.com/inwardik/quiz-generator.git`.
 
 Run `pip install -r requirements.txt`.
+
 RUN `python to_html.py`
 
 Have fun!
