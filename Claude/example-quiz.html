@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Programming Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #4f46e5;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --hover-bg: #f1f5f9;
+        }
+
+        body.dark-mode {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
+            --hover-bg: #334155;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), #7c3aed);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-size: 1.1em;
+            color: var(--text-secondary);
+        }
+
+        .stats span {
+            font-weight: 600;
+        }
+
+        #score {
+            color: var(--primary-color);
+            font-size: 1.2em;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .question-card.answered {
+            opacity: 0.7;
+        }
+
+        .question-text {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .answer-option {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .answer-option:hover {
+            background: var(--hover-bg);
+            border-color: var(--primary-color);
+        }
+
+        .answer-option input[type="radio"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .answer-text {
+            flex: 1;
+            font-size: 1.05em;
+        }
+
+        .answer-indicator {
+            font-size: 1.5em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .answer-option.correct {
+            background: #d1fae5;
+            border-color: var(--success-color);
+        }
+
+        body.dark-mode .answer-option.correct {
+            background: #064e3b;
+        }
+
+        .answer-option.correct .answer-indicator {
+            opacity: 1;
+        }
+
+        .answer-option.correct .answer-indicator::after {
+            content: '✓';
+            color: var(--success-color);
+        }
+
+        .answer-option.incorrect {
+            background: #fee2e2;
+            border-color: var(--error-color);
+        }
+
+        body.dark-mode .answer-option.incorrect {
+            background: #7f1d1d;
+        }
+
+        .answer-option.incorrect .answer-indicator {
+            opacity: 1;
+        }
+
+        .answer-option.incorrect .answer-indicator::after {
+            content: '✗';
+            color: var(--error-color);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px 18px;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .feedback.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid var(--success-color);
+        }
+
+        body.dark-mode .feedback.success {
+            background: #064e3b;
+            color: #6ee7b7;
+        }
+
+        .feedback.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid var(--error-color);
+        }
+
+        body.dark-mode .feedback.error {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .results {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .results h2 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+        }
+
+        .result-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            gap: 20px;
+        }
+
+        .stat-item {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+        }
+
+        #theme-toggle {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.2s ease;
+        }
+
+        #theme-toggle:hover {
+            background: var(--hover-bg);
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .question-card {
+                padding: 20px;
+            }
+
+            .result-stats {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Python Programming Quiz</h1>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            <div class="stats">
+                <span>Вопрос <span id="current-question">1</span> из <span id="total-questions">15</span></span>
+                <span>Баллы: <span id="score">0</span></span>
+            </div>
+        </header>
+
+        <main id="quiz-container">
+            <div class="question-card" data-question="0">
+                <h3 class="question-text">Q1. Что такое list comprehension в Python?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-0" value="0" data-correct="true">
+                        <span class="answer-text">Компактный способ создания списков</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-0" value="1" >
+                        <span class="answer-text">Библиотека для работы со списками</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-0" value="2" >
+                        <span class="answer-text">Функция для сжатия списков</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-0" value="3" >
+                        <span class="answer-text">Метод для чтения списков</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="1">
+                <h3 class="question-text">Q2. Какой оператор используется для проверки принадлежности элемента к последовательности?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-1" value="0" >
+                        <span class="answer-text">is</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-1" value="1" >
+                        <span class="answer-text">contains</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-1" value="2" data-correct="true">
+                        <span class="answer-text">in</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-1" value="3" >
+                        <span class="answer-text">has</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="2">
+                <h3 class="question-text">Q3. Что делает оператор // в Python?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-2" value="0" >
+                        <span class="answer-text">Комментирует код</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-2" value="1" data-correct="true">
+                        <span class="answer-text">Целочисленное деление</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-2" value="2" >
+                        <span class="answer-text">Возведение в степень</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-2" value="3" >
+                        <span class="answer-text">Обычное деление</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="3">
+                <h3 class="question-text">Q4. Какой метод используется для удаления элемента из списка по значению?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-3" value="0" >
+                        <span class="answer-text">del()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-3" value="1" data-correct="true">
+                        <span class="answer-text">remove()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-3" value="2" >
+                        <span class="answer-text">erase()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-3" value="3" >
+                        <span class="answer-text">delete()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="4">
+                <h3 class="question-text">Q5. Что выведет код: print(type([]))</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-4" value="0" >
+                        <span class="answer-text"><class 'array'></span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-4" value="1" >
+                        <span class="answer-text"><class 'dict'></span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-4" value="2" data-correct="true">
+                        <span class="answer-text"><class 'list'></span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-4" value="3" >
+                        <span class="answer-text"><class 'tuple'></span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="5">
+                <h3 class="question-text">Q6. Какой метод словаря возвращает все ключи?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-5" value="0" >
+                        <span class="answer-text">getKeys()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-5" value="1" data-correct="true">
+                        <span class="answer-text">keys()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-5" value="2" >
+                        <span class="answer-text">all_keys()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-5" value="3" >
+                        <span class="answer-text">get_keys()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="6">
+                <h3 class="question-text">Q7. Какой метод используется для добавления элемента в конец списка?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-6" value="0" >
+                        <span class="answer-text">push()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-6" value="1" >
+                        <span class="answer-text">insert()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-6" value="2" data-correct="true">
+                        <span class="answer-text">append()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-6" value="3" >
+                        <span class="answer-text">add()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="7">
+                <h3 class="question-text">Q8. Что делает метод split() для строк?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-7" value="0" >
+                        <span class="answer-text">Удаляет пробелы</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-7" value="1" >
+                        <span class="answer-text">Объединяет строки</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-7" value="2" data-correct="true">
+                        <span class="answer-text">Разбивает строку на список подстрок</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-7" value="3" >
+                        <span class="answer-text">Сортирует символы</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="8">
+                <h3 class="question-text">Q9. Какой метод возвращает количество элементов в списке?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-8" value="0" >
+                        <span class="answer-text">size()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-8" value="1" >
+                        <span class="answer-text">count()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-8" value="2" >
+                        <span class="answer-text">length()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-8" value="3" data-correct="true">
+                        <span class="answer-text">len()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="9">
+                <h3 class="question-text">Q10. Что такое None в Python?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-9" value="0" data-correct="true">
+                        <span class="answer-text">Специальное значение, обозначающее отсутствие значения</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-9" value="1" >
+                        <span class="answer-text">Ошибка</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-9" value="2" >
+                        <span class="answer-text">Пустая строка</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-9" value="3" >
+                        <span class="answer-text">Ноль</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="10">
+                <h3 class="question-text">Q11. Что выведет print(3 * "Python")?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-10" value="0" >
+                        <span class="answer-text">3Python</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-10" value="1" >
+                        <span class="answer-text">Python3</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-10" value="2" >
+                        <span class="answer-text">Error</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-10" value="3" data-correct="true">
+                        <span class="answer-text">PythonPythonPython</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="11">
+                <h3 class="question-text">Q12. Что выведет print(bool([]))?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-11" value="0" >
+                        <span class="answer-text">None</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-11" value="1" data-correct="true">
+                        <span class="answer-text">False</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-11" value="2" >
+                        <span class="answer-text">Error</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-11" value="3" >
+                        <span class="answer-text">True</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="12">
+                <h3 class="question-text">Q13. Какая функция преобразует строку в число с плавающей точкой?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-12" value="0" >
+                        <span class="answer-text">number()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-12" value="1" >
+                        <span class="answer-text">int()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-12" value="2" >
+                        <span class="answer-text">decimal()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-12" value="3" data-correct="true">
+                        <span class="answer-text">float()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="13">
+                <h3 class="question-text">Q14. Какая функция используется для чтения пользовательского ввода?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-13" value="0" >
+                        <span class="answer-text">scan()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-13" value="1" >
+                        <span class="answer-text">read()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-13" value="2" data-correct="true">
+                        <span class="answer-text">input()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-13" value="3" >
+                        <span class="answer-text">get()</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+            <div class="question-card" data-question="14">
+                <h3 class="question-text">Q15. Какой из следующих типов данных является неизменяемым (immutable)?</h3>
+                <div class="answers">
+                    <label class="answer-option">
+                        <input type="radio" name="question-14" value="0" >
+                        <span class="answer-text">set</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-14" value="1" >
+                        <span class="answer-text">dict</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-14" value="2" >
+                        <span class="answer-text">list</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                    <label class="answer-option">
+                        <input type="radio" name="question-14" value="3" data-correct="true">
+                        <span class="answer-text">tuple</span>
+                        <span class="answer-indicator"></span>
+                    </label>
+                </div>
+                <div class="feedback hidden"></div>
+            </div>
+
+        </main>
+
+        <div id="results" class="results hidden">
+            <h2>Результаты теста</h2>
+            <div class="result-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="final-score">0</div>
+                    <div class="stat-label">Итоговый балл</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="correct-answers">0</div>
+                    <div class="stat-label">Правильных ответов</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="accuracy">0%</div>
+                    <div class="stat-label">Точность</div>
+                </div>
+            </div>
+            <button onclick="restartQuiz()" class="btn btn-primary">Пройти снова</button>
+        </div>
+
+        <footer>
+            <button id="theme-toggle" onclick="toggleTheme()">🌙 Темная тема</button>
+        </footer>
+    </div>
+
+    <script>
+        let score = 0;
+        let answeredQuestions = 0;
+        const totalQuestions = 15;
+        let answers = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const radioButtons = document.querySelectorAll('input[type="radio"]');
+
+            radioButtons.forEach(radio => {
+                radio.addEventListener('change', function(e) {
+                    handleAnswer(e.target);
+                });
+            });
+
+            // Restore dark mode preference
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('theme-toggle').textContent = '☀️ Светлая тема';
+            }
+        });
+
+        function handleAnswer(radio) {
+            const questionCard = radio.closest('.question-card');
+            const questionNum = questionCard.dataset.question;
+            const allOptions = questionCard.querySelectorAll('.answer-option');
+            const feedback = questionCard.querySelector('.feedback');
+
+            // Prevent answering twice
+            if (answers[questionNum] !== undefined) {
+                return;
+            }
+
+            // Disable all options in this question
+            allOptions.forEach(option => {
+                option.querySelector('input').disabled = true;
+            });
+
+            const isCorrect = radio.hasAttribute('data-correct');
+            const selectedOption = radio.closest('.answer-option');
+
+            // Mark the selected answer
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+                feedback.textContent = '✓ Правильно!';
+                feedback.classList.add('success');
+                score++;
+            } else {
+                selectedOption.classList.add('incorrect');
+                // Show correct answer
+                allOptions.forEach(option => {
+                    if (option.querySelector('input').hasAttribute('data-correct')) {
+                        option.classList.add('correct');
+                    }
+                });
+                feedback.textContent = '✗ Неправильно. Правильный ответ выделен зеленым.';
+                feedback.classList.add('error');
+            }
+
+            feedback.classList.remove('hidden');
+            questionCard.classList.add('answered');
+            answers[questionNum] = isCorrect;
+            answeredQuestions++;
+
+            // Update UI
+            updateProgress();
+            updateScore();
+
+            // Check if quiz is complete
+            if (answeredQuestions === totalQuestions) {
+                setTimeout(showResults, 500);
+            }
+        }
+
+        function updateProgress() {
+            const progress = (answeredQuestions / totalQuestions) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            document.getElementById('current-question').textContent = Math.min(answeredQuestions + 1, totalQuestions);
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+
+        function showResults() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+
+            const accuracy = Math.round((score / totalQuestions) * 100);
+
+            document.getElementById('final-score').textContent = score + ' / ' + totalQuestions;
+            document.getElementById('correct-answers').textContent = score;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function restartQuiz() {
+            // Reset state
+            score = 0;
+            answeredQuestions = 0;
+            answers = {};
+
+            // Reset UI
+            document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+
+            // Reset all questions
+            document.querySelectorAll('.question-card').forEach(card => {
+                card.classList.remove('answered');
+                card.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.checked = false;
+                    radio.disabled = false;
+                });
+                card.querySelectorAll('.answer-option').forEach(option => {
+                    option.classList.remove('correct', 'incorrect');
+                });
+                card.querySelector('.feedback').classList.add('hidden');
+                card.querySelector('.feedback').classList.remove('success', 'error');
+            });
+
+            updateProgress();
+            updateScore();
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.getElementById('theme-toggle');
+
+            body.classList.toggle('dark-mode');
+
+            if (body.classList.contains('dark-mode')) {
+                button.textContent = '☀️ Светлая тема';
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                button.textContent = '🌙 Темная тема';
+                localStorage.setItem('darkMode', 'false');
+            }
+        }
+    </script>
+</body>
+</html>
